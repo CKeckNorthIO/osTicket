@@ -531,6 +531,7 @@ foreach ($staff->teams as $TM) {
         </tr>
       </tbody>
     </table>
+  </div>
   <!-- ==================== SIGNATURES ======================== -->
 
   <div class="hidden tab_content" id="signature">
