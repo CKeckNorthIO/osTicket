@@ -1301,6 +1301,10 @@ implements AuthenticatedUser, EmailContact, TemplateVariable, Searchable {
         $this->max_page_size = $vars['max_page_size'];
         $this->auto_refresh_rate = $vars['auto_refresh_rate'];
         $this->default_signature_type = $vars['default_signature_type'];
+        $this->signature = Format::sanitize($vars['signature']);
+        
+        // Cleanup signature draft for this user
+        Draft::deleteForNamespace('staff.signature_by_admin.'.$this->getId());
 
         // Set staff password if exists
         if (!$vars['welcome_email'] && $vars['passwd1']) {
