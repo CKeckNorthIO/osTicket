@@ -58,7 +58,7 @@
             // Just upload the file. A draft will be created automatically
             // and will be configured locally in the afterUpateDraft()
             this.opts.clipboardUpload =
-            this.opts.imageUpload = this.autoCreateUrl + '/attach';
+            this.opts.imageUpload = this.autoCreateUrl + '/attach?' + $.param({'CSRFToken': $("meta[name=csrf_token]").attr("content")});
             this.opts.imageCaption = false;
         }
         this.opts.autosaveData = {
@@ -81,7 +81,7 @@
         this.opts.autosave = 'ajax.php/draft/' + draft_id;
         this.opts.clipboardUpload =
         this.opts.imageUpload =
-            'ajax.php/draft/' + draft_id + '/attach';
+            'ajax.php/draft/' + draft_id + '/attach?' + $.param({'CSRFToken': $("meta[name=csrf_token]").attr("content")});
         this.opts.imageCaption = false;
 
         // Add [Delete Draft] button to the toolbar
@@ -199,7 +199,7 @@
                 self.app.source.setCode(self.opts.draftOriginal || '');
                 self.opts.autosave = self.autoCreateUrl;
                 self.opts.clipboardUpload =
-                self.opts.imageUpload = self.autoCreateUrl + '/attach';
+                self.opts.imageUpload = self.autoCreateUrl + '/attach?' + $.param({'CSRFToken': $("meta[name=csrf_token]").attr("content")});
                 self.opts.imageCaption = false;
                 self.deleteButton.hide();
                 self.saveButton.hide();
@@ -386,7 +386,7 @@ $(function() {
                 'imageCaption': false,
                 'imageManagerJson': 'ajax.php/draft/images/browse',
                 'imagePosition': true,
-                'imageUploadData': {
+                'imageData': {
                     '__CSRFToken__': $("meta[name=csrf_token]").attr("content")
                 },
                 'imageResizable': true,

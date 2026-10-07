@@ -139,7 +139,7 @@ class DraftAjaxAPI extends AjaxController {
             // Return draft_id to connect the auto draft creation
             'draft_id' => $draft->getId(),
             'url' => $f->getDownloadUrl(
-                ['type' => 'D', 'deposition' => 'inline']),
+                ['type' => 'D', 'disposition' => 'inline']),
         )));
     }
 
