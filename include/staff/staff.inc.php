@@ -57,6 +57,7 @@ $extras = new ArrayObject();
     <li><a href="#permissions"><?php echo __('Permissions'); ?></a></li>
     <li><a href="#teams"><?php echo __('Teams'); ?></a></li>
     <?php Signal::send('agenttab.audit', $staff, $extras); ?>
+    <li><a href="#signature"><?php echo __('Agent\'s Signature'); ?></a></li>
   </ul>
 
   <div class="tab_content" id="account">
