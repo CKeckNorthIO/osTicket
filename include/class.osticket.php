@@ -320,7 +320,8 @@ class osTicket {
             .',title='.db_input(Format::sanitize($title, true))
             .',log_type='.db_input($loglevel[$level])
             .',log='.db_input(Format::sanitize($message, false))
-            .',ip_address='.db_input($_SERVER['REMOTE_ADDR']);
+            .',ip_address='.db_input($_SERVER['REMOTE_ADDR'])
+            .',logger=""';
 
         db_query($sql, false);
 
@@ -366,10 +367,10 @@ class osTicket {
 
     static function get_path_info() {
         if(isset($_SERVER['PATH_INFO']))
-            return $_SERVER['PATH_INFO'];
+            return htmlentities($_SERVER['PATH_INFO']);
 
         if(isset($_SERVER['ORIG_PATH_INFO']))
-            return $_SERVER['ORIG_PATH_INFO'];
+            return htmlentities($_SERVER['ORIG_PATH_INFO']);
 
         //TODO: conruct possible path info.
 

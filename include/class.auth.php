@@ -419,7 +419,7 @@ abstract class AuthenticationBackend extends ServiceRegistry {
             if ($bk instanceof AuthDirectorySearch)
                 $backends[$bk->getBkId()] = $bk;
 
-        return array_unique($backends);
+        return array_unique($backends, SORT_REGULAR);
     }
 
     static function searchUsers($query) {
@@ -1255,7 +1255,7 @@ class PasswordResetTokenBackend extends StaffAuthenticationBackend {
                 || $id != $staff->getId())
             $errors['msg'] = __('Invalid reset token');
         elseif (!($ts = $_config->lastModified($_POST['token']))
-                && ($ost->getConfig()->getPwResetWindow() < (time() - strtotime($ts))))
+                || ($ost->getConfig()->getPwResetWindow() < (time() - strtotime($ts))))
             $errors['msg'] = __('Invalid reset token');
         elseif (!$staff->forcePasswdRest())
             $errors['msg'] = __('Unable to reset password');
@@ -1482,7 +1482,7 @@ class ClientPasswordResetTokenBackend extends UserAuthenticationBackend {
                 || $id != 'c'.$client->getId())
             $errors['msg'] = __('Invalid reset token');
         elseif (!($ts = $_config->lastModified($_POST['token']))
-                && ($ost->getConfig()->getPwResetWindow() < (time() - strtotime($ts))))
+                || ($ost->getConfig()->getPwResetWindow() < (time() - strtotime($ts))))
             $errors['msg'] = __('Invalid reset token');
         elseif (!$acct->forcePasswdReset())
             $errors['msg'] = __('Unable to reset password');
@@ -1622,9 +1622,13 @@ extends PasswordPolicy {
     }
 
     function onSet($passwd, $current) {
-        if (strlen($passwd) < 6) {
+        $pwdlen = strlen($passwd);
+        if ($pwdlen < 6) {
             throw new BadPassword(
                 __('Password must be at least 6 characters'));
+        } elseif ($pwdlen > 128) {
+            throw new BadPassword(
+                sprintf('%s - %s', __('Password is too long'), __('maximum of 128 characters allowed')));
         }
         // XXX: Changing case is technicall changing the password
         if (0 === strcasecmp($passwd, $current)) {

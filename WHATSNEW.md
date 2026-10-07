@@ -1,3 +1,198 @@
+osTicket v1.18.4
+================
+### Security
+* security: Latest Patches 06/2026 (52c366f, 5afdf54, c54a6ac, 1e39bf1, feccb6a, 6eb6b98, 078516e, 98abb05, e52e010, fd96bba, 7bbd8ab, ba6217a, 580e1c8, b535782, 5963797, d590a97, eaebe01, b4cc092, d457c14, 5600f94, 5ff9795, 119cefe, b4ede88, 2a0c388, 6558b33)
+
+osTicket v1.18.3
+================
+### Enhancements
+* mPDF: Upgrade To v8.2.7 (39cdd2b1)
+* htmLawed: Upgrade To 1.2.15 (877adf56)
+
+### Security
+* security: Latest Patches 01/2026 (c646c8cb, d1b634a9, 6852e719, 8db4d377, 1552cfa3, d832f243)
+
+osTicket v1.18.2
+================
+### Improvements
+* OAuth2: Show Scopes and Enforce Strict Mode (a77cf535, 390555db)
+
+osTicket v1.18.1
+================
+### Improvements
+* Update upgrade.php (9fd83eba)
+* Update upgrade.inc.php (8c8a7fd1)
+* update: PHP Requirements 1.18.x (1c0c670b)
+* CLI: Make sure manage util can be executed via CLI (0caf5864)
+* Update raphael-min.js to 2.3.0 (d4aeada1)
+
+osTicket v1.18
+==============
+### Enhancements
+* update: Laminas-Mail (66fa10af, bb45d37a)
+
+### Improvements
+* Database: Change Plugin Name to varchar(255) (aac546d0)
+* update: MAJOR_VERSION (3eac42e5)
+
+osTicket v1.17.8
+================
+### Security
+* security: Latest Patches 06/2026 (52c366f, 5afdf54, c54a6ac, 1e39bf1, feccb6a, 6eb6b98, 078516e, 98abb05, e52e010, fd96bba, 7bbd8ab, ba6217a, 580e1c8, b535782, 5963797, d590a97, eaebe01, b4cc092, d457c14, 5600f94, 5ff9795, 119cefe, b4ede88, 2a0c388, 6558b33)
+
+osTicket v1.17.7
+================
+### Enhancements
+* mPDF: Upgrade To v8.2.7 (39cdd2b1)
+* htmLawed: Upgrade To 1.2.15 (877adf56)
+
+### Improvements
+* join cdata table earlier (81ec2562)
+* issue: Content Management Errors (2a4fe6ad)
+* mail: SMTPUTF8 Backwards Compatibility (05b87199)
+* issue: SVG MIME Type (a6309e22)
+* Fix Banlist permission check (a7f14bf2)
+* issue: POP OAuth2 Error REGEX (10f38bd0)
+* issue: Kazakh Flag CSS (624c7171)
+* Fixing Argentinian flag (924380a9)
+* Update class.setup.php (8b6a0f05)
+* Fixes for Implicitly marking parameters as nullable (573e8496, ca13d888)
+* issue: Date Column Interval (1e38901e)
+* issue: PGP + S/MIME Mail Parsing (9aff6b03)
+* issue: Trim User Name (0fbafda1)
+* issue: Microsoft UTF-8 BOM (5074c032)
+* issue: Empty Dept Error On Topic Update (f1ba934b)
+* Fix typo in 'Add New Instance' title (ae434418)
+* Update class.file.php (1425fe1e)
+* issue: Regex OR Operator (331ca48d)
+* Revert "issue: Guest Session TTL" (c3819e4d)
+
+### Security
+* security: Latest Patches 01/2026 (c646c8cb, d1b634a9, 6852e719, 8db4d377, 1552cfa3, d832f243)
+
+osTicket v1.17.6
+================
+### Improvements
+* Fix PR #6283: DB column value of "local backend" is 'client' and not 'local' (7805cd94)
+* i18n: Tasks Department ID Missing (00bc6b1b)
+* issue: Checkbox Template Variable (09de9587)
+* Fixed mailfetch error message (cd4717a1)
+* issue: fix square characters being printed when printing tickets that's using languages like Thai (872a6492, 25844034)
+* issue: Position Styling.. Again (7f03a64b, b843fb15)
+* mysqli: Multi-Host Failure (0a8475fb)
+* issue: Task Last Respondent (5277c7ab)
+* i18n: Schedules getDays() (f2facda3)
+* issue: Referred Closed Tickets (a7b0711d)
+* php: Update Prerequisites (d331a44c)
+* i18n: Lang URL Param (fece6ff7)
+* mysql: Update Minimum Version (317ab967)
+* Fix ajax path for AddRemoteCollaborator (6df6cd98)
+* Fix staff mobile field class (f8455c82)
+* patches: Latest 05/28/2024 (2d65cb77, 36b4c94f, 854cf47c, d9fe3ada)
+* upgrade: Laminas-Mail (2.25.1) (c0a74162, 939a278c, f658268d)
+* hotfix: Fix getRawEmail() (c26d840c, 1eb71197)
+* issue: Linked Icon annotation (6c096cce)
+* fix(email): fix case sensitivity in "Action" header retrieval (07843598)
+* Upgrade mimeDecode.php from v1.48 to v1.5.6 2016-08-28 (cbd78ac8)
+* mailer: sendmail() Failure (14e2057b)
+* php: 8.3 Support (a3931f46, b38db372, fea5e1e0, 387a1c04, 136d372e)
+* issue: Ticket Relations (9426b2dd)
+* issue: Basic Search Selector (74b8bd0e)
+* mail: Reapply Memory Optimization (eaaa64d9, ab76ffe8)
+* php: iconv Recommendation (33ecc3a0)
+* Ignore VS Code Workspace Files (0da2e0e0)
+* issue: Email Remote Backend Name (b54dd584)
+* issue: Safari Response Content Disposition (64a5df68)
+* api: DueDate and Other Errors (14814ae2)
+* issue: Multiselect List Export (f3bf8553)
+* issue: Image Annotation (aeeb2850)
+* user: List Import (fec70c4a)
+* issue: Latest SQL Warnings (9bdfde5a)
+* fields: Variable Name Validation (0724d1ad)
+* issue: Transfer Empty Comments Var (ed87b257)
+* update: Composer symfony/process (59f25918)
+* issue: Client ACL Staff File Download (8255b2e7)
+* update: PHP Deprecations & Warnings (84c14ace)
+* issue: User Lookup Umlaut (504b0bfb)
+* issue: Department Field User Import (5c2b6a5d)
+* Fix force_https auto-enabling on settings page (3805bbfd)
+* queue: getTotal Incorrect Counts (4f137dc2)
+* issue: Referred Tickets Incorrect Queue Counts (b42cad6f)
+* php: 8.4 Support (a4c0f674, b4938b99, 5e5a9ff5, fb9a39ba)
+* issue: Canned Response Access (b930a68b)
+* issue: Excessive Fetching Errors (c546a167)
+* issue: Plain-text Base64 (216ded32)
+* i18n: Crowdin API v2 (0ec6670d)
+* issue: iFrame Logins (3a5da66b)
+* issue: mimeDecode .eml Attachments (7fc3d8c2)
+* patches: Latest 11/18/2024 (416b548b, 245e7554)
+* Revert part of 0784359 commit (ec76a203)
+
+### Security
+* security: Latest Vulns 01/2025 (193f5fe0, ab6672fa)
+
+osTicket v1.17.5
+================
+### Improvements
+* update: README.md PHP & Laminas (4baf9dc8, 555c4a74, 88294e2d, 30a4a6e9)
+* issue: putenv() Disabled (3c0d5f47)
+* i18n: Update Signing (98706274, 776c0f27)
+* i18n: Flags Position & Codes (3ee11112, 45f5b5b4)
+* mailer: Undefined SmtpAccount::getName() (560a4f1d)
+* issue: SystemSessionHandler (7e17daa6)
+* issue: Status List Overflow (1deee342)
+* faq: Category Notes Images (ccca0f59)
+* patches: Latest 10/03/2023 (65e12297, 48e8501d, a8d42a9d, 4475e03e, bd034712, 64b8c81d, 070eefcb, 1775ce75)
+* mail: NoValidateCert (d3c140ce)
+* issue: Choice/Selection Field Searches (00e22fad)
+* stubs: Add stubs to pass lint test (895c7236)
+* issue: Canned Response Inline Images (a503c160)
+* format: Viewable Images Bug (2a412883)
+
+### Security
+* issue: CSP Headers (6228f640)
+* security: Latest Vulns 09/2023 (04f4e611, 88a87a33, c4ad48de, 37cf8350)
+* issue: User Account Creation (777e6f0b)
+
+osTicket v1.17.4
+================
+### Improvements
+* issue: Thread Entry Actions z-index (215a0ce2)
+* oauth2: Strict Matching Bug (e014ffd2)
+* Make string translatable (1105cde7)
+* issue: Inline-Images Canned Responses (4493b126)
+* issue: Remove Old Login Code (e17ad463)
+* issue: i18n Audit Exports (45dd7c4f)
+* Bug: Custom File Upload Field Config (6371269a, 7283ac81, 902b5d35)
+* issue: Duplicate User Copy/Paste Import (b304cdb)
+* issue: Relocate Typeahead JS/CSS Files (62cd406)
+* issue: strftime() Deprecation (3fe132c4)
+* jquery: Update To 3.7.0 (ffa23da)
+* issue: glob() Empty Array (c64a2611)
+* issue: Email Only Attachment (9e45f3fa)
+* installer: Change Email (a11aee29)
+
+### Security
+* security: Latest Vulns 06/2023 (86c2ba02, 69244175, 73b997a, ae37925, e4bfb00)
+
+osTicket v1.17.3
+================
+### Enhancements
+* oauth2: Strict Matching (7275d67b, b7718be4, ca913ba2, cb3625e8, f531718a, c0cd8b16)
+* OAuth2 Resource Owner (5c239adb)
+
+### Improvements
+* session: Regenerate Session Id (d5853245)
+* fetcher: Mail Fetcher / Parser Error Handling (d4d9c424, 0a4498b2)
+* mysql: Support Sidecar Database Proxies (246aaa4d)
+* Misc. Fixes (e6beeb9b, 24fd5075, eac9960a, 10af29a5)
+* fetcher: Default Department (f410d4ec)
+* issue: LDAP Multi-Instance Fatal Error (f6486044)
+* issue: TicketDenied errno (6de7cf4c)
+* session: User Logged Out (00d409d3)
+* Uncaught Error: Call to a member function getId() on bool (af83896d)
+* Mailer: Inline Images (7efbdfd2, 8815d087, 64a8abf3)
+
 osTicket v1.17.2
 ================
 ### Improvements
@@ -83,6 +278,30 @@ osTicket v1.17-rc1
 ==================
 ### Enhancements
 * Oauth2 / Modern Email Authentication Support (d99ff6e1-163c28b5)
+
+osTicket v1.16.6
+================
+### Improvements
+* session: Collab View Ticket (6afe0efa)
+* issue: Static forTask() (1079011f)
+* issue: Featured FAQs (8df09581)
+* print: Hidden Thread Events (f63fc67d)
+* issue: Does Not Have A Value (d47fc2b1)
+* issue: Disabled Queues Run Counts (3ff3ce93)
+* issue: Queue Counts Incorrect (2428cc58)
+* jquery: Update jQueryUI 1.13.2 (b896f70d)
+* issue: Department Export (5418cf20)
+* jquery: Update To 3.6.3 (8d39a4cc)
+* i18n: make-pot (74274b5c)
+* update: README PHP Version (6087bc55)
+* issue: mPDF Font Files (427a8aa6)
+* issue: FileUpload False (8dd2ab61)
+* Add translation for "last resort" standard column labels (cb528044)
+* add translation for task status (46c005a0)
+* issue: getRealPath() Stub (32a229aa)
+
+### Security
+* security: Latest Security Patches 03/2023 (86f9693d, 091ddba9, ec604393, daee20fd, 9fb01bc1, 619ce0f6, 343a2b47, 8a55c29f, e2c8f799, ee7ce3d9, 263f71a3)
 
 osTicket v1.16.5
 ================

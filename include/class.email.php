@@ -17,6 +17,7 @@ include_once(INCLUDE_DIR.'class.dept.php');
 include_once(INCLUDE_DIR.'class.mail.php');
 include_once(INCLUDE_DIR.'class.mailer.php');
 include_once(INCLUDE_DIR.'class.oauth2.php');
+include_once(INCLUDE_DIR.'class.mime.php');
 include_once(INCLUDE_DIR.'class.mailfetch.php');
 include_once(INCLUDE_DIR.'class.mailparse.php');
 include_once(INCLUDE_DIR.'api.tickets.php');
@@ -334,12 +335,12 @@ class Email extends VerySimpleModel {
         if ($errors) return false;
 
         // Update basic settings
-        $this->email = $vars['email'];
+        $this->email = Format::sanitize($vars['email']);
         $this->name = Format::striptags($vars['name']);
-        $this->dept_id = $vars['dept_id'];
-        $this->priority_id = isset($vars['priority_id']) ? $vars['priority_id'] : '0';
-        $this->topic_id = $vars['topic_id'];
-        $this->noautoresp = $vars['noautoresp'];
+        $this->dept_id = (int) $vars['dept_id'];
+        $this->priority_id = (int) (isset($vars['priority_id']) ? $vars['priority_id'] : 0);
+        $this->topic_id = (int) $vars['topic_id'];
+        $this->noautoresp = (int) $vars['noautoresp'];
         $this->notes = Format::sanitize($vars['notes']);
 
         if ($this->save())
@@ -487,6 +488,17 @@ class EmailAccount extends VerySimpleModel {
             : true;
     }
 
+    public function isStrict() {
+        return $this->getConfig()->getStrictMatching();
+    }
+
+    public function checkStrictMatching($token=null) {
+        $token ??= $this->getAccessToken();
+        return ($token && $token->isMatch(
+                $this->getEmail()->getEmail(),
+                $this->isStrict()));
+    }
+
     public function shouldAuthorize() {
         // check status and make sure it's oauth
         if (!$this->isAuthBackendEnabled() || !$this->isOAuthAuth())
@@ -497,7 +509,10 @@ class EmailAccount extends VerySimpleModel {
                 // changed somehow
                 || !($token=$cred->getAccessToken($this->getConfigSignature()))
                 // Check if expired
-                || $token->isExpired());
+                || $token->isExpired()
+                // If Strict Matching is enabled ensure the email matches
+                // the Resource Owner
+                || !$this->checkStrictMatching($token));
 
     }
 
@@ -522,7 +537,8 @@ class EmailAccount extends VerySimpleModel {
             $id = sprintf('%s:%d',
                 $this->getAuthBk(), $this->getId());
             if ($this->isOAuthAuth())
-                $id .= sprintf(':%d', $this->getAuthId());
+                $id .= sprintf(':%d:%b',
+                    $this->getAuthId(), $this->isStrict()); #TODO: Remove strict and delegate to email account
 
             $this->bkId = $id;
         }
@@ -535,6 +551,15 @@ class EmailAccount extends VerySimpleModel {
 
     public function getEmail() {
         return $this->email;
+    }
+
+    public function getName() {
+        return $this->getEmail()->getName();
+    }
+
+    public function getAccessToken() {
+        $cred = $this->getFreshCredentials();
+        return $cred ? $cred->getAccessToken($this->getConfigSignature()) : null;
     }
 
     private function getOAuth2Backend($auth=null) {
@@ -550,6 +575,7 @@ class EmailAccount extends VerySimpleModel {
             'name' => sprintf('%s (%s)',
                     $email->getEmail(), $this->getType()),
             'isactive' => 1,
+            'strict_matching' => $this->isStrict(),
             'notes' => sprintf(
                     __('OAuth2 Authorization for %s'), $email->getEmail()),
         ];
@@ -624,7 +650,7 @@ class EmailAccount extends VerySimpleModel {
                  $this->getId());
     }
 
-    private function getConfig() {
+    protected function getConfig() {
         if (!isset($this->config))
             $this->config = new EmailAccountConfig($this->getNamespace());
         return $this->config;
@@ -688,6 +714,8 @@ class EmailAccount extends VerySimpleModel {
                             // Auth backend can be changed on update
                             $this->auth_bk = $auth;
                             $this->save();
+                            // Update Strict Matching
+                            $this->getConfig()->setStrictMatching($_POST['strict_matching'] ? 1 : 0);
                         } elseif (!isset($errors['err'])) {
                             $errors['err'] = sprintf('%s %s',
                                     __('Error Saving'),
@@ -899,13 +927,20 @@ class EmailAccount extends VerySimpleModel {
     }
 
     private function updateOAuth2AuthCredentials($provider, $vars, &$errors) {
+        $err = sprintf('%s_auth_bk', $this->getType());
         if (!$vars['access_token']) {
-            $errors['access_token'] = __('Access Token Required');
+            $errors[$err] = __('Access Token Required');
         } elseif (!$vars['resource_owner_email']
                 || !Validator::is_email($vars['resource_owner_email'])) {
-            $errors['resource_owner_email'] =
-                __('Resource Owner Required');
-
+            $errors[$err] = __('Resource Owner Required');
+        } elseif ($this->isStrict()
+            // When in Strict mode Account Email must match resource owner's
+            // email. Strict mode can be disabled for a global admin to
+            // authorized onbehalf of other user accounts or shared mailboxes.
+            && strcasecmp($this->getEmail()->getEmail(), $vars['resource_owner_email'])) {
+            $errors[$err] = sprintf(__('Strict Mode: Expecting Authorization for %s not %s'),
+                        $this->getEmail()->getEmail(),
+                        $vars['resource_owner_email']);
         } elseif (!$errors) {
             // Encrypt Access Token
             $vars['access_token'] = Crypto::encrypt(
@@ -960,6 +995,13 @@ class EmailAccount extends VerySimpleModel {
         return $this->save();
     }
 
+    /*
+     * Destory the account config
+     */
+    function destroyConfig() {
+        return $this->getConfig()->destroy();
+    }
+
     function update($vars, &$errors) {
         return false;
     }
@@ -987,7 +1029,7 @@ class EmailAccount extends VerySimpleModel {
 
     function delete() {
         // Destroy the Email config
-        $this->getConfig()->destroy();
+        $this->destroyConfig();
         // Delete the Plugin instance
         if ($this->isOAuthAuth() && ($i=$this->getOAuth2Instance()))
             $i->delete();
@@ -1070,7 +1112,7 @@ class MailBoxAccount extends EmailAccount {
         return $this->getMailBox($creds);
     }
 
-    public function getMailBox(osTicket\Mail\AuthCredentials $cred=null) {
+    public function getMailBox(?osTicket\Mail\AuthCredentials $cred=null) {
         if (!isset($this->mailbox) || $cred) {
             $this->cred = $cred ?: $this->getFreshCredentials();
             $setting = $this->getAccountSetting();
@@ -1242,6 +1284,23 @@ class SmtpAccount extends EmailAccount {
             ->filter(['type' => 'smtp']);
     }
 
+    public function isMailboxAuth() {
+        return (strcasecmp($this->getAuthBk(), 'mailbox') === 0);
+    }
+
+    /*
+     * Check if using mailbox auth and MailboxAccount exists if so
+     * return the MailboxAccount config, otherwise return it's own
+     * config
+     */
+    protected function getConfig() {
+        if ($this->isMailboxAuth()
+                && ($email=$this->getEmail())
+                && ($account=$email->getMailBoxAccount()))
+            return $account->getConfig();
+        return parent::getConfig();
+    }
+
     public function allowSpoofing() {
         return ($this->allow_spoofing);
     }
@@ -1258,7 +1317,7 @@ class SmtpAccount extends EmailAccount {
         return $this->smtp;
     }
 
-    public function getSmtp(osTicket\Mail\AuthCredentials $cred=null) {
+    public function getSmtp(?osTicket\Mail\AuthCredentials $cred=null) {
         if (!isset($this->smtp) || $cred) {
             $this->cred = $cred ?: $this->getFreshCredentials();
             if ($this->cred) {
@@ -1294,6 +1353,14 @@ class SmtpAccount extends EmailAccount {
                 && strcasecmp($vars['smtp_auth_bk'], 'mailbox')
                 && !($creds=$this->getFreshCredentials($vars['smtp_auth_bk'])))
             $_errors['smtp_auth_bk'] = __('Configure Authentication');
+
+        // Check if set to active and using mailbox auth, if so check strict
+        // matching.
+        if ($vars['smtp_active'] == 1
+                && ($vars['smtp_auth_bk'] === 'mailbox')
+                && (strpos($vars['mailbox_auth_bk'], 'oauth2') === 0)
+                && !$this->checkStrictMatching())
+            $_errors['smtp_auth_bk'] = sprintf('%s and %s', __('Resource Owner'), __('Email Mismatch'));
 
         if (!$_errors) {
             $this->active = $vars['smtp_active'] ? 1 : 0;
@@ -1340,6 +1407,20 @@ class SmtpAccount extends EmailAccount {
  *
  */
 class EmailAccountConfig extends Config {
+    /*
+     * Get strict matching (default: true)
+     */
+    public function getStrictMatching() {
+        return $this->get('strict_matching', true);
+    }
+
+    /*
+     * Set strict matching
+     */
+    public function setStrictMatching($mode) {
+        return $this->set('strict_matching', !!$mode);
+    }
+
     public function updateInfo($vars) {
         return parent::updateAll($vars);
     }

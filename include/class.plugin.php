@@ -69,7 +69,7 @@ abstract class PluginConfig extends Config {
         return $this->instance;
     }
 
-    function setInstance(PluginInstance $i=null) {
+    function setInstance(?PluginInstance $i=null) {
         $this->instance = $i;
     }
 
@@ -116,7 +116,7 @@ abstract class PluginConfig extends Config {
      * returns (true | false)
      *
      */
-    function store(SimpleForm $form = null, &$errors=array()) {
+    function store(?SimpleForm $form = null, &$errors=array()) {
 
         try {
             if ($this->hasCustomConfig())
@@ -368,6 +368,8 @@ class PluginManager {
      * registered in the plugin registry -- the %plugin table.
      */
     function install($path) {
+        // Fixup $path to ensure we are only installing from the plugin dir
+        $path = 'plugins/' . basename($path);
         $is_phar = substr($path, strlen($path) - 5) == '.phar';
         if (!($info = $this->getInfoForPath(INCLUDE_DIR . $path, $is_phar)))
             return false;
@@ -778,7 +780,7 @@ class Plugin extends VerySimpleModel {
         return $this->config_class;
     }
 
-    function getConfig(PluginInstance $instance = null, $defaults = []) {
+    function getConfig(?PluginInstance $instance = null, $defaults = []) {
         if ((!isset($this->config) || $instance)
                 && ($class=$this->getConfigClass())) {
             // We cache instance config for side loading purposes on

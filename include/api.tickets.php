@@ -43,15 +43,22 @@ class TicketApiController extends ApiController {
             foreach ($form->getFields() as $field)
                 $supported[] = $field->get('name');
 
-        if(!strcasecmp($format, 'email')) {
-            $supported = array_merge($supported, array('header', 'mid',
-                'emailId', 'to-email-id', 'ticketId', 'reply-to', 'reply-to-name',
-                'in-reply-to', 'references', 'thread-type', 'system_emails',
-                'mailflags' => array('bounce', 'auto-reply', 'spam', 'viral'),
-                'recipients' => array('*' => array('name', 'email', 'source'))
-                ));
-
-            $supported['attachments']['*'][] = 'cid';
+        switch ($format) {
+            case 'email':
+                $supported = array_merge($supported, [
+                    'header', 'mid', 'emailId', 'to-email-id', 'ticketId', 'reply-to',
+                    'reply-to-name', 'in-reply-to', 'references', 'thread-type', 'system_emails',
+                    'mailflags' => ['bounce', 'auto-reply', 'spam', 'viral'],
+                    'recipients' => ['*' => ['name', 'email', 'source']]
+                ]);
+                $supported['attachments']['*'][] = 'cid';
+                break;
+            case 'json':
+            case 'xml':
+                $supported = array_merge($supported, [
+                    'duedate', 'slaId', 'staffId'
+                ]);
+                break;
         }
 
         return $supported;
@@ -78,7 +85,7 @@ class TicketApiController extends ApiController {
             $data['attachments'] = array();
 
         //Validate attachments: Do error checking... soft fail - set the error and pass on the request.
-        if ($data['attachments'] && is_array($data['attachments'])) {
+        if (isset($data['attachments']) && is_array($data['attachments'])) {
             foreach($data['attachments'] as &$file) {
                 if ($file['encoding'] && !strcasecmp($file['encoding'], 'base64')) {
                     if(!($file['data'] = base64_decode($file['data'], true)))
@@ -114,7 +121,7 @@ class TicketApiController extends ApiController {
             $ticket = $this->processEmailRequest();
         } else {
             // Get and Parse request body data for the format
-            $ticket = $this->createTicket($this->getEmailRequest($format));
+            $ticket = $this->createTicket($this->getRequest($format));
         }
 
 
@@ -164,14 +171,14 @@ class TicketApiController extends ApiController {
 
         $error = sprintf('%s :%s',
                 _S('Unable to create new ticket'), $error);
-        return $this->exerr(500, $error, $title);
+        return $this->exerr($errors['errno'] ?: 500, $error, $title);
     }
 
     function processEmailRequest() {
         return $this->processEmail();
     }
 
-    function processEmail($data=false) {
+    function processEmail($data=false, array $defaults = []) {
 
         try {
             if (!$data)
@@ -182,6 +189,7 @@ class TicketApiController extends ApiController {
             throw new EmailParseError($ex->getMessage());
         }
 
+        $data = array_merge($defaults, $data);
         $seen = false;
         if (($entry = ThreadEntry::lookupByEmailHeaders($data, $seen))
             && ($message = $entry->postEmail($data))

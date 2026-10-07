@@ -22,8 +22,6 @@ class Bootstrap {
 
         #Error reporting...Good idea to ENABLE error reporting to a file. i.e display_errors should be set to false
         $error_reporting = E_ALL & ~E_NOTICE & ~E_WARNING;
-        if (defined('E_STRICT')) # 5.4.0
-            $error_reporting &= ~E_STRICT;
         if (defined('E_DEPRECATED')) # 5.3.0
             $error_reporting &= ~(E_DEPRECATED | E_USER_DEPRECATED);
         error_reporting($error_reporting); //Respect whatever is set in php.ini (sysadmin knows better??)
@@ -44,6 +42,15 @@ class Bootstrap {
             }
         }
         date_default_timezone_set('UTC');
+
+        if (!function_exists('exif_imagetype')) {
+            function exif_imagetype ($filename) {
+                if ((list($width,$height,$type,) = getimagesize($filename)) !== false)
+                    return $type;
+
+                return false;
+            }
+        }
 
         if (!function_exists('exif_imagetype')) {
             function exif_imagetype ($filename) {
@@ -202,13 +209,22 @@ class Bootstrap {
                 'key' => DBSSLKEY
             );
 
-        if (!db_connect(DBHOST, DBUSER, DBPASS, $options)) {
-            $ferror=sprintf('Unable to connect to the database — %s',db_connect_error());
-        }elseif(!db_select_database(DBNAME)) {
-            $ferror=sprintf('Unknown or invalid database: %s',DBNAME);
+        $hosts = explode(',', DBHOST);
+        foreach ($hosts as $host) {
+            $ferror  = null;
+            try {
+                if (!db_connect($host, DBUSER, DBPASS, $options))
+                    $ferror = sprintf('Unable to connect to the database — %s', db_connect_error());
+                elseif (!db_select_database(DBNAME))
+                    $ferror = sprintf('Unknown or invalid database: %s', DBNAME);
+            } catch (mysqli_sql_exception $e) {
+                $ferror = sprintf('Database error — %s', $e->getMessage());
+            }
+            // break if no error
+            if (!$ferror) break;
         }
 
-        if($ferror) //Fatal error
+        if ($ferror) //Fatal error
             self::croak($ferror);
     }
 
@@ -324,7 +340,7 @@ class Bootstrap {
     static function croak($message) {
         $msg = $message."\n\n".THISPAGE;
         osTicket\Mail\Mailer::sendmail(ADMIN_EMAIL, 'osTicket Fatal Error', $msg,
-            sprintf('"osTicket Alerts"<%s>', ADMIN_EMAIL));
+            sprintf('"osTicket Alerts" <%s>', ADMIN_EMAIL));
         //Display generic error to the user
         Http::response(500, "<b>Fatal Error:</b> Contact system administrator.");
     }
@@ -351,7 +367,7 @@ define('CLI_DIR', INCLUDE_DIR.'cli/');
 
 #Current version && schema signature (Changes from version to version)
 define('GIT_VERSION','$git');
-define('MAJOR_VERSION', '1.17');
+define('MAJOR_VERSION', '1.18');
 define('THIS_VERSION', MAJOR_VERSION.'-git'); //Shown on admin panel
 //Path separator
 if(!defined('PATH_SEPARATOR')){

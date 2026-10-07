@@ -23,6 +23,7 @@ namespace osTicket\OAuth2 {
         protected $expires;
         protected $refreshToken;
         protected $resourceOwnerId;
+        protected $scope;
         // osTicket specific
         protected $resourceOwnerEmail;
         protected $configSignature;
@@ -49,6 +50,9 @@ namespace osTicket\OAuth2 {
 
             if (!empty($options['resource_owner_email']))
                 $this->resourceOwnerEmail = $options['resource_owner_email'];
+
+            if (!empty($options['scope']))
+                $this->scope = $options['scope'];
         }
 
         public function getToken() {
@@ -79,6 +83,10 @@ namespace osTicket\OAuth2 {
             return $this->getResourceOwnerEmail();
         }
 
+        public function getScope() {
+            return $this->scope;
+        }
+
         public function getConfigSignature() {
             return $this->configSignature;
         }
@@ -95,14 +103,17 @@ namespace osTicket\OAuth2 {
             return $this->hasExpired();
         }
 
-        public function getAuthRequest() {
+        public function isMatch($email, $strict=false) {
+            return (!$strict || strcasecmp($this->getResourceOwnerEmail(), $email) === 0);
+        }
+
+        public function getAuthRequest($user=null) {
             if ($this->hasExpired())
                 throw new Exception('Access Token is Expired');
 
             return base64_encode(sprintf("user=%s\1auth=Bearer %s\1\1",
-                        $this->getResourceOwner(),
-                        $this->getAccessToken()
-                        ));
+                $user ?? $this->getResourceOwner(),
+                $this->getAccessToken()));
         }
 
         public function __toString() {
