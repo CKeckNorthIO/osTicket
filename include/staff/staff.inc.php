@@ -531,6 +531,31 @@ foreach ($staff->teams as $TM) {
         </tr>
       </tbody>
     </table>
+  <!-- ==================== SIGNATURES ======================== -->
+
+  <div class="hidden tab_content" id="signature">
+    <table class="table two-column" width="100%">
+      <tbody>
+        <tr class="header">
+          <th colspan="2">
+            <?php echo __('Signature'); ?>
+            <div><small><?php echo __(
+            "Optional signature used on outgoing emails.")
+            .' '.
+            __('Signature is made available as a choice, on ticket reply.'); ?>
+            </small></div>
+          </th>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <textarea class="richtext draft draft-delete" name="signature" cols="21"
+                    rows="5" style="width: 100%;"
+<?php list($draft, $attrs) = Draft::getDraftAndDataAttrs('staff.signature_by_admin', $staff->getId(), $staff->signature);
+echo $attrs; ?>><?php echo $draft ?: Format::viewableImages(Format::htmlchars($staff->signature)); ?></textarea>
+            </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- ============== Audits =================== -->
