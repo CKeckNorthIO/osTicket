@@ -124,6 +124,13 @@ department_signature:
         Each Agent can also customize the refresh rate for their own
         account under <span class="doc-desc-title">Profile</span>.
 
+default_signature:
+    title: Default Signature
+        content: >
+            Select the signature that should be preselected for replies from this Agent.<br/>
+            Each Agent can also change the preselected signature for their own
+            account under <span class="doc-desc-title">Profile</span>.
+
 daylight_saving:
     title: Daylight Saving
     content: >
